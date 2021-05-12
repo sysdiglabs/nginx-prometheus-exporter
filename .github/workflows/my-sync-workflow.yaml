@@ -1,8 +1,6 @@
 on:
   schedule:
     - cron:  '0 1 * * *'
-  workflow_dispatch:  # click the button on Github repo!
-
 
 jobs:
   sync_with_upstream:
