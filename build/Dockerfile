@@ -17,5 +17,6 @@ RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -trimpat
 
 FROM scratch as intermediate
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build nginx-prometheus-exporter /usr/bin/nginx-prometheus-exporter
 USER 1001:1001
 ENTRYPOINT [ "/usr/bin/nginx-prometheus-exporter" ]
