@@ -28,12 +28,14 @@ jobs:
     - name: Publish docker image
       run: |
         docker tag artifactory.internal.sysdig.com/$EXPORTER_NAME:latest artifactory.internal.sysdig.com/$EXPORTER_NAME:${{ github.event.release.tag_name }}-${{ matrix.docker }}
+        docker tag artifactory.internal.sysdig.com/$EXPORTER_NAME:latest artifactory.internal.sysdig.com/$EXPORTER_NAME:${{ github.event.release.tag_name }}
         docker push artifactory.internal.sysdig.com/$EXPORTER_NAME:${{ github.event.release.tag_name }}-${{ matrix.docker }}
+        docker push artifactory.internal.sysdig.com/$EXPORTER_NAME:${{ github.event.release.tag_name }}
         docker push artifactory.internal.sysdig.com/$EXPORTER_NAME:latest
     - name: Upload master to Quay.io
       uses: fjogeleit/http-request-action@master
       with:
-        url: 'https://sysdig-jenkins.internal.sysdig.com/view/Integrations/job/integrations-nginx-exporter/buildWithParameters?token=${{ secrets.JENKINS_PROMCAT_LAUNCH_TOKEN }}&EXPORTER=nginx-exporter&DRY_RUN=false'
+        url: 'https://sysdig-jenkins.internal.sysdig.com/view/Integrations/job/integrations-jmx-exporter/buildWithParameters?token=${{ secrets.JENKINS_PROMCAT_LAUNCH_TOKEN }}&EXPORTER=promcat-jmx-exporter&DRY_RUN=false'
         method: 'POST'
         username: david.lorite@sysdig.com
         password: ${{ secrets.JENKINS_PROMCAT_API_TOKEN }}
