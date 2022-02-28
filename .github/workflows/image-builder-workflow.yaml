@@ -36,7 +36,7 @@ jobs:
         run: |
           docker pull artifactory.internal.sysdig.com/$EXPORTER_NAME:$VERSION
           export RELEASE=$(docker inspect --format '{{ index .Config.Labels "release" }}' artifactory.internal.sysdig.com/$EXPORTER_NAME:$VERSION)
-          docker build --label release=$RELEASE -f ./docker/Dockerfile -t $EXPORTER_NAME:$VERSION --target ${{ matrix.docker }} . 
+          docker build --label release=$RELEASE -f ./build/Dockerfile -t $EXPORTER_NAME:$VERSION --target ${{ matrix.docker }} . 
       - name: Scan local image
         id: scan-local
         uses: sysdiglabs/scan-action@v3
