@@ -21,7 +21,7 @@ COPY --from=builder /usr/bin/nginx-prometheus-exporter /usr/bin/nginx-prometheus
 USER 1001:1001
 ENTRYPOINT [ "/usr/bin/nginx-prometheus-exporter" ]
 
-FROM quay.io/sysdig/sysdig-mini-ubi:1.2.8 as ubi
+FROM quay.io/sysdig/sysdig-mini-ubi:1.2.9 as ubi
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /usr/bin/nginx-prometheus-exporter /usr/bin/nginx-prometheus-exporter
 USER 1001:1001
