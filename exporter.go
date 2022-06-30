@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -202,7 +201,7 @@ func getListener(listenAddress string) (net.Listener, error) {
 	if strings.HasPrefix(listenAddress, "unix:") {
 		path, _, pathError := parseUnixSocketAddress(listenAddress)
 		if pathError != nil {
-			return listener, fmt.Errorf("parsing unix domain socket listen address %s failed: %v", listenAddress, pathError)
+			return listener, fmt.Errorf("parsing unix domain socket listen address %s failed: %w", listenAddress, pathError)
 		}
 		listener, err = net.ListenUnix("unix", &net.UnixAddr{Name: path, Net: "unix"})
 	} else {
@@ -325,9 +324,10 @@ func main() {
 
 	registry.MustRegister(buildInfoMetric)
 
+	// #nosec G402
 	sslConfig := &tls.Config{InsecureSkipVerify: !*sslVerify}
 	if *sslCaCert != "" {
-		caCert, err := ioutil.ReadFile(*sslCaCert)
+		caCert, err := os.ReadFile(*sslCaCert)
 		if err != nil {
 			log.Fatalf("Loading CA cert failed: %v", err)
 		}
@@ -434,10 +434,10 @@ func main() {
 		}
 		log.Printf("NGINX Prometheus Exporter has successfully started using https")
 		log.Fatal(srv.ServeTLS(listener, *sslServerCert, *sslServerKey))
-	} else {
-		log.Printf("NGINX Prometheus Exporter has successfully started")
-		log.Fatal(srv.Serve(listener))
 	}
+
+	log.Printf("NGINX Prometheus Exporter has successfully started")
+	log.Fatal(srv.Serve(listener))
 }
 
 type userAgentRoundTripper struct {
