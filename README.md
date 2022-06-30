@@ -1,4 +1,4 @@
-[![Continuous Integration](https://github.com/nginxinc/nginx-prometheus-exporter/workflows/Continuous%20Integration/badge.svg)](https://github.com/nginxinc/nginx-prometheus-exporter/actions?query=workflow%3A%22Continuous+Integration%22)  [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B5618%2Fgithub.com%2Fnginxinc%2Fnginx-prometheus-exporter.svg?type=shield)](https://app.fossa.com/projects/custom%2B5618%2Fgithub.com%2Fnginxinc%2Fnginx-prometheus-exporter?ref=badge_shield)  [![Go Report Card](https://goreportcard.com/badge/github.com/nginxinc/nginx-prometheus-exporter)](https://goreportcard.com/report/github.com/nginxinc/nginx-prometheus-exporter)
+[![Continuous Integration](https://github.com/nginxinc/nginx-prometheus-exporter/workflows/Continuous%20Integration/badge.svg)](https://github.com/nginxinc/nginx-prometheus-exporter/actions?query=workflow%3A%22Continuous+Integration%22)  [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B5618%2Fgithub.com%2Fnginxinc%2Fnginx-prometheus-exporter.svg?type=shield)](https://app.fossa.com/projects/custom%2B5618%2Fgithub.com%2Fnginxinc%2Fnginx-prometheus-exporter?ref=badge_shield)  [![Go Report Card](https://goreportcard.com/badge/github.com/nginxinc/nginx-prometheus-exporter)](https://goreportcard.com/report/github.com/nginxinc/nginx-prometheus-exporter) ![GitHub all releases](https://img.shields.io/github/downloads/nginxinc/nginx-prometheus-exporter/total?logo=github) ![GitHub release (latest by SemVer)](https://img.shields.io/github/downloads/nginxinc/nginx-prometheus-exporter/latest/total?sort=semver&logo=github) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/nginxinc/nginx-prometheus-exporter?logo=github&sort=semver)](https://github.com/nginxinc/nginx-prometheus-exporter/releases/latest) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/nginxinc/nginx-prometheus-exporter?logo=go) [![Docker Pulls](https://img.shields.io/docker/pulls/nginx/nginx-prometheus-exporter?logo=docker&logoColor=white)](https://hub.docker.com/r/nginx/nginx-prometheus-exporter) ![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/nginx/nginx-prometheus-exporter?logo=docker&logoColor=white&sort=semver)
 
 # NGINX Prometheus Exporter
 
@@ -14,7 +14,7 @@ In this section, we show how to quickly run NGINX Prometheus Exporter for NGINX 
 
 ### A Note about NGINX Ingress Controller
 
-If you’d like to use the NGINX Prometheus Exporter with [NGINX Ingress Controller](https://github.com/nginxinc/kubernetes-ingress/) for Kubernetes, see [this doc](https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md#5-access-the-live-activity-monitoring-dashboard) for the installation instructions.
+If you’d like to use the NGINX Prometheus Exporter with [NGINX Ingress Controller](https://github.com/nginxinc/kubernetes-ingress/) for Kubernetes, see [this doc](https://docs.nginx.com/nginx-ingress-controller/logging-and-monitoring/prometheus/) for the installation instructions.
 
 ### Prerequisites
 
@@ -30,13 +30,13 @@ To start the exporter we use the [docker run](https://docs.docker.com/engine/ref
 
 * To export NGINX metrics, run:
     ```
-    $ docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.9.0 -nginx.scrape-uri=http://<nginx>:8080/stub_status
+    $ docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.10.0 -nginx.scrape-uri=http://<nginx>:8080/stub_status
     ```
     where `<nginx>` is the IP address/DNS name, through which NGINX is available.
 
 * To export NGINX Plus metrics, run:
     ```
-    $ docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.9.0 -nginx.plus -nginx.scrape-uri=http://<nginx-plus>:8080/api
+    $ docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.10.0 -nginx.plus -nginx.scrape-uri=http://<nginx-plus>:8080/api
     ```
     where `<nginx-plus>` is the IP address/DNS name, through which NGINX Plus is available.
 
@@ -173,6 +173,7 @@ Name | Type | Description | Labels
 ----|----|----|----|
 `nginxplus_upstream_server_state` | Gauge | Current state | `server`, `upstream` |
 `nginxplus_upstream_server_active` | Gauge | Active connections | `server`, `upstream` |
+`nginxplus_upstream_server_limit` | Gauge | Limit for connections which corresponds to the max_conns parameter of the upstream server. Zero value means there is no limit | `server`, `upstream` |
 `nginxplus_upstream_server_requests` | Counter | Total client requests | `server`, `upstream` |
 `nginxplus_upstream_server_responses` | Counter | Total responses sent to clients | `code` (the response status code. The values are: `1xx`, `2xx`, `3xx`, `4xx` and `5xx`), `server`, `upstream` |
 `nginxplus_upstream_server_sent` | Counter | Bytes sent to this server | `server`, `upstream` |
@@ -195,8 +196,9 @@ Name | Type | Description | Labels
 ----|----|----|----|
 `nginxplus_stream_upstream_server_state` | Gauge | Current state | `server`, `upstream` |
 `nginxplus_stream_upstream_server_active` | Gauge | Active connections | `server` , `upstream` |
+`nginxplus_stream_upstream_server_limit` | Gauge | Limit for connections which corresponds to the max_conns parameter of the upstream server. Zero value means there is no limit | `server` , `upstream` |
 `nginxplus_stream_upstream_server_connections` | Counter | Total number of client connections forwarded to this server | `server`, `upstream` |
-`nginxplus_stream_upstream_server_connect_time` | Gauge | Average time to connect to the upstream server | `server`, `upstream` 
+`nginxplus_stream_upstream_server_connect_time` | Gauge | Average time to connect to the upstream server | `server`, `upstream`
 `nginxplus_stream_upstream_server_first_byte_time` | Gauge | Average time to receive the first byte of data | `server`, `upstream` |
 `nginxplus_stream_upstream_server_response_time` | Gauge | Average time to receive the last byte of data | `server`, `upstream` |
 `nginxplus_stream_upstream_server_sent` | Counter | Bytes sent to this server | `server`, `upstream` |
@@ -251,7 +253,23 @@ The exporter logs errors to the standard output. When using Docker, if the expor
 
 ## Releases
 
-For each release, we publish the corresponding Docker image at `nginx/nginx-prometheus-exporter` [DockerHub repo](https://hub.docker.com/r/nginx/nginx-prometheus-exporter/) and the binaries on the GitHub [releases page](https://github.com/nginxinc/nginx-prometheus-exporter/releases).
+### Docker images
+We publish the Docker image on [DockerHub](https://hub.docker.com/r/nginx/nginx-prometheus-exporter/), [GitHub Container](https://github.com/nginxinc/nginx-prometheus-exporter/pkgs/container/nginx-prometheus-exporter), [Amazon ECR Public Gallery](https://gallery.ecr.aws/nginx/nginx-prometheus-exporter) and [Quay.io](https://quay.io/repository/nginx/nginx-prometheus-exporter).
+
+As an alternative, you can choose the *edge* version built from the [latest commit](https://github.com/nginxinc/nginx-prometheus-exporter/commits/main) from the main branch. The edge version is useful for experimenting with new features that are not yet published in a stable release.
+
+### Binaries
+We publish the binaries for multiple Operating Systems and architectures on the GitHub [releases page](https://github.com/nginxinc/nginx-prometheus-exporter/releases).
+
+### Homebrew
+You can add the NGINX homebrew tap with
+```
+$ brew tap nginxinc/tap
+```
+and then install the formula with
+```
+$ brew install nginx-prometheus-exporter
+```
 
 ## Building the Exporter
 
