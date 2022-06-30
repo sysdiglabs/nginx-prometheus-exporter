@@ -1,0 +1,40 @@
+pipeline {
+    agent {
+        label 'qa_terminating_j8'
+    }
+
+    options {
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        registryCredential = 'jenkins-artifactory'
+        ARTIFACTORY_URL = 'docker.internal.sysdig.com'
+        EXPORTER = 'nginx-exporter'
+        VERSION = 'v0.9.0'
+    }
+
+    stages {
+        stage('Pull image from artifactory') {
+            steps {
+                script {
+                    docker.withRegistry("https://${env.ARTIFACTORY_URL}",  registryCredential) {                        
+                        sh """docker pull ${env.ARTIFACTORY_URL}/${env.EXPORTER}:${env.VERSION}"""
+                    }
+                }
+            }
+        }
+        stage('Push image to Quay'){
+            steps {
+                script {
+                    docker.withRegistry("https://quay.io", "QUAY") {
+                        sh """docker tag ${env.ARTIFACTORY_URL}/${env.EXPORTER}:${env.VERSION} quay.io/sysdig/${env.EXPORTER}:latest"""
+                        sh """docker push quay.io/sysdig/${env.EXPORTER}:latest"""
+                        sh """docker tag ${env.ARTIFACTORY_URL}/${env.EXPORTER}:${env.VERSION} quay.io/sysdig/${env.EXPORTER}:${env.VERSION}"""
+                        sh """docker push quay.io/sysdig/${env.EXPORTER}:${env.VERSION}"""
+                    }
+                }
+            }
+        }
+    }
+}
